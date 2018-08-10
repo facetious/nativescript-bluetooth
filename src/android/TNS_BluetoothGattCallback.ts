@@ -27,14 +27,46 @@ export class TNS_BluetoothGattCallback extends android.bluetooth.BluetoothGattCa
   onConnectionStateChange(gatt: android.bluetooth.BluetoothGatt, status: number, newState: number) {
     CLog(CLogTypes.info, `TNS_BluetoothGattCallback.onConnectionStateChange ---- gatt: ${gatt}, status: ${status}, newState: ${newState}`);
     if (newState === android.bluetooth.BluetoothProfile.STATE_CONNECTED && status === android.bluetooth.BluetoothGatt.GATT_SUCCESS) {
-      CLog(CLogTypes.info, 'TNS_BluetoothGattCallback.onConnectionStateChange ---- discovering services -----');
-      // First things first; let's request the max MTU.
-      gatt.requestMtu(247);
+      this.select2MPHY(gatt);
     } else {
       CLog(CLogTypes.info, `TNS_BluetoothGattCallback.onConnectionStateChange ---- disconnecting the gatt: ${gatt} ----`);
       // perhaps the device was manually disconnected, or in use by another device
       this.owner.get().gattDisconnect(gatt);
     }
+  }
+
+  selectMaxMTU(gatt: android.bluetooth.BluetoothGatt) {
+    CLog(CLogTypes.info, 'TNS_BluetoothGattCallback.selectMaxMTU ---- requesting max MTU (247) -----');
+    gatt.requestMtu(247);
+  }
+
+  select2MPHY(gatt: android.bluetooth.BluetoothGatt) {
+    CLog(CLogTypes.info, 'TNS_BluetoothGattCallback.select2MPHY ---- selecting 2M PHY -----');
+    gatt.setPreferredPhy(
+      android.bluetooth.BluetoothDevice.PHY_LE_2M_MASK,
+      android.bluetooth.BluetoothDevice.PHY_LE_2M_MASK,
+      android.bluetooth.BluetoothDevice.PHY_OPTION_NO_PREFERRED
+    );
+  }
+
+  /**
+   * Callback indicating the MTU for a given device connection has changed. This callback is triggered in response to the requestMtu(int) function, or in response to a connection event.
+   * @param gatt - GATT client invoked requestMtu(int).
+   * @param mtu - The new MTU size.
+   * @param status - GATT_SUCCESS if the MTU has been changed successfully.
+   */
+  onMtuChanged(gatt: android.bluetooth.BluetoothGatt, mtu: number, status: number) {
+    CLog(CLogTypes.info, `TNS_BluetoothGattCallback.onMtuChanged ---- gatt: ${gatt} mtu: ${mtu}, status: ${status}`);
+
+    // Discovers services offered by a remote device as well as their characteristics and descriptors.
+    CLog(CLogTypes.info, 'TNS_BluetoothGattCallback.___ ---- discovering services -----');
+    gatt.discoverServices();
+  }
+
+  onPhyUpdate(gatt: android.bluetooth.BluetoothGatt, txPhy: number, rxPhy: number, status: number) {
+    CLog(CLogTypes.info, `TNS_BluetoothGattCallback.onPhyUpdate ---- gatt: ${gatt} txPhy: ${txPhy}, rxPhy: ${rxPhy}, status: ${status}`);
+
+    this.selectMaxMTU(gatt);
   }
 
   /**
@@ -264,18 +296,5 @@ export class TNS_BluetoothGattCallback extends android.bluetooth.BluetoothGattCa
    */
   onReadRemoteRssi(gatt: android.bluetooth.BluetoothGatt, rssi: number, status: number) {
     CLog(CLogTypes.info, `TNS_BluetoothGattCallback.onReadRemoteRssi ---- gatt: ${gatt} rssi: ${rssi}, status: ${status}`);
-  }
-
-  /**
-   * Callback indicating the MTU for a given device connection has changed. This callback is triggered in response to the requestMtu(int) function, or in response to a connection event.
-   * @param gatt - GATT client invoked requestMtu(int).
-   * @param mtu - The new MTU size.
-   * @param status - GATT_SUCCESS if the MTU has been changed successfully.
-   */
-  onMtuChanged(gatt: android.bluetooth.BluetoothGatt, mtu: number, status: number) {
-    CLog(CLogTypes.info, `TNS_BluetoothGattCallback.onMtuChanged ---- gatt: ${gatt} mtu: ${mtu}, status: ${status}`);
-
-    // Discovers services offered by a remote device as well as their characteristics and descriptors.
-    gatt.discoverServices();
   }
 }
