@@ -165,8 +165,8 @@ export class TNS_BluetoothGattCallback extends android.bluetooth.BluetoothGattCa
         valueRaw: value,
         value: this.owner.get().decodeValue(value),
         peripheralUUID: gatt.getDevice().getAddress(),
-        serviceUUID: characteristic.getService().getUuid(),
-        characteristicUUID: characteristic.getUuid()
+        serviceUUID: this.owner.get().uuidToString(characteristic.getService().getUuid()),
+        characteristicUUID: this.owner.get().uuidToString(characteristic.getUuid())
       });
     }
   }
@@ -195,8 +195,8 @@ export class TNS_BluetoothGattCallback extends android.bluetooth.BluetoothGattCa
         valueRaw: value,
         value: this.owner.get().decodeValue(value),
         peripheralUUID: gatt.getDevice().getAddress(),
-        serviceUUID: characteristic.getService().getUuid(),
-        characteristicUUID: characteristic.getUuid()
+        serviceUUID: this.owner.get().uuidToString(characteristic.getService().getUuid()),
+        characteristicUUID: this.owner.get().uuidToString(characteristic.getUuid())
       });
     }
   }
@@ -229,7 +229,9 @@ export class TNS_BluetoothGattCallback extends android.bluetooth.BluetoothGattCa
 
     if (stateObject.onWritePromise) {
       stateObject.onWritePromise({
-        characteristicUUID: characteristic.getUuid()
+        peripheralUUID: gatt.getDevice().getAddress(),
+        serviceUUID: this.owner.get().uuidToString(characteristic.getService().getUuid()),
+        characteristicUUID: this.owner.get().uuidToString(characteristic.getUuid())
       });
     }
   }
