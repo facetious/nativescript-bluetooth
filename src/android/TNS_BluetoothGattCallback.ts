@@ -41,12 +41,23 @@ export class TNS_BluetoothGattCallback extends android.bluetooth.BluetoothGattCa
   }
 
   select2MPHY(gatt: android.bluetooth.BluetoothGatt) {
-    CLog(CLogTypes.info, 'TNS_BluetoothGattCallback.select2MPHY ---- selecting 2M PHY -----');
-    gatt.setPreferredPhy(
-      android.bluetooth.BluetoothDevice.PHY_LE_2M_MASK,
-      android.bluetooth.BluetoothDevice.PHY_LE_2M_MASK,
-      android.bluetooth.BluetoothDevice.PHY_OPTION_NO_PREFERRED
-    );
+    if (this.owner.get().adapter.isLe2MPhySupported()) {
+      CLog(CLogTypes.info, 'TNS_BluetoothGattCallback.select2MPHY ---- selecting 2M PHY -----');
+      gatt.setPreferredPhy(
+        android.bluetooth.BluetoothDevice.PHY_LE_2M_MASK,
+        android.bluetooth.BluetoothDevice.PHY_LE_2M_MASK,
+        android.bluetooth.BluetoothDevice.PHY_OPTION_NO_PREFERRED
+      );
+    } else {
+      CLog(CLogTypes.info, 'TNS_BluetoothGattCallback.select2MPHY ---- skipping 2M PHY selection: not supported -----');
+      this.selectMaxMTU(gatt);
+    }
+  }
+
+  discoverServices(gatt: android.bluetooth.BluetoothGatt) {
+    // Discovers services offered by a remote device as well as their characteristics and descriptors.
+    CLog(CLogTypes.info, 'TNS_BluetoothGattCallback.___ ---- discovering services -----');
+    gatt.discoverServices();
   }
 
   /**
@@ -58,9 +69,7 @@ export class TNS_BluetoothGattCallback extends android.bluetooth.BluetoothGattCa
   onMtuChanged(gatt: android.bluetooth.BluetoothGatt, mtu: number, status: number) {
     CLog(CLogTypes.info, `TNS_BluetoothGattCallback.onMtuChanged ---- gatt: ${gatt} mtu: ${mtu}, status: ${status}`);
 
-    // Discovers services offered by a remote device as well as their characteristics and descriptors.
-    CLog(CLogTypes.info, 'TNS_BluetoothGattCallback.___ ---- discovering services -----');
-    gatt.discoverServices();
+    this.discoverServices(gatt);
   }
 
   onPhyUpdate(gatt: android.bluetooth.BluetoothGatt, txPhy: number, rxPhy: number, status: number) {
