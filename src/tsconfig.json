@@ -8,9 +8,11 @@
     "emitDecoratorMetadata": true,
     "noEmitHelpers": true,
     "noEmitOnError": false,
-    "declaration": false,
+    "declaration": true,
     "lib": ["es6", "es2016", "dom"],
-    "baseUrl": ".",
+    "outDir": "./",
+    "baseUrl": "./",
+    "sourceMap": false,
     "typeRoots": ["./node_modules/@types"]
   },
   "compileOnSave": false,
