@@ -1,3 +1,7 @@
 .idea/
 .vscode/
 media/
+*.map
+*.ts
+!*.d.ts
+tsconfig.json
