@@ -292,7 +292,7 @@ export class TNS_BluetoothGattCallback extends android.bluetooth.BluetoothGattCa
   }
 
   private select2MPHY(gatt: android.bluetooth.BluetoothGatt) {
-    if (this.owner.get().adapter.isLe2MPhySupported()) {
+    if (parseInt(android.os.Build.VERSION.SDK) >= 26 && this.owner.get().adapter.isLe2MPhySupported()) {
       CLog(CLogTypes.info, 'TNS_BluetoothGattCallback.select2MPHY ---- selecting 2M PHY -----');
       gatt.setPreferredPhy(
         android.bluetooth.BluetoothDevice.PHY_LE_2M_MASK,
