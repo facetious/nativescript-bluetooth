@@ -115,6 +115,7 @@ export class CBCentralManagerDelegateImpl extends NSObject implements CBCentralM
       if (this._owner.get()._onDiscovered) {
         let manufacturerId;
         let manufacturerData;
+        let name = advData.objectForKey(CBAdvertisementDataLocalNameKey);
         if (advData.objectForKey(CBAdvertisementDataManufacturerDataKey)) {
           const manufacturerIdBuffer = this._owner
             .get()
@@ -131,7 +132,7 @@ export class CBCentralManagerDelegateImpl extends NSObject implements CBCentralM
 
         this._owner.get()._onDiscovered({
           UUID: peripheral.identifier.UUIDString,
-          name: peripheral.name,
+          name: name || peripheral.name,
           RSSI: RSSI,
           state: this._owner.get()._getState(peripheral.state),
           manufacturerId: manufacturerId,
