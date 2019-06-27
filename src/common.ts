@@ -288,6 +288,11 @@ export interface Peripheral {
    */
   services?: Service[];
 
+  /**
+   * MTU of the connection (only the value of initial connection is used).
+   */
+  mtu?: number;
+
   manufacturerId?: number;
 
   manufacturerData?: ArrayBuffer;
