@@ -5,6 +5,7 @@ import { CLog, CLogTypes } from '../common';
 // tslint:disable-next-line:class-name
 export class TNS_BluetoothGattCallback extends android.bluetooth.BluetoothGattCallback {
   private owner: WeakRef<Bluetooth>;
+  private mtu: number = 20;
   constructor() {
     super();
     return global.__native(this);
@@ -127,7 +128,8 @@ export class TNS_BluetoothGattCallback extends android.bluetooth.BluetoothGattCa
         UUID: device.getAddress(), // TODO consider renaming to id (and iOS as well)
         name: device.getName(),
         state: 'connected', // Bluetooth._getState(peripheral.state),
-        services: servicesJs
+        services: servicesJs,
+        mtu: this.mtu
       });
     }
   }
@@ -260,6 +262,7 @@ export class TNS_BluetoothGattCallback extends android.bluetooth.BluetoothGattCa
    */
   onMtuChanged(gatt: android.bluetooth.BluetoothGatt, mtu: number, status: number) {
     CLog(CLogTypes.info, `TNS_BluetoothGattCallback.onMtuChanged ---- gatt: ${gatt} mtu: ${mtu}, status: ${status}`);
+    this.mtu = mtu;
 
     this.discoverServices(gatt);
   }

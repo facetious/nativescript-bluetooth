@@ -120,7 +120,8 @@ export class CBPeripheralDelegateImpl extends NSObject implements CBPeripheralDe
           UUID: peripheral.identifier.UUIDString,
           name: peripheral.name,
           state: this._owner.get()._getState(peripheral.state),
-          services: this._servicesWithCharacteristics
+          services: this._servicesWithCharacteristics,
+          mtu: 185
         });
         this._callback = null;
       }
