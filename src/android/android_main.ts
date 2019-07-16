@@ -116,7 +116,7 @@ export class Bluetooth extends BluetoothCommon {
           if (callback) {
             callback();
           }
-          resolve();
+          resolve(true);
         }
       };
 
