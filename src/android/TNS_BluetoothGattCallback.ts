@@ -229,7 +229,7 @@ export class TNS_BluetoothGattCallback extends android.bluetooth.BluetoothGattCa
         peripheralUUID: gatt.getDevice().getAddress(),
         serviceUUID: this.owner.get().uuidToString(characteristic.getService().getUuid()),
         characteristicUUID: this.owner.get().uuidToString(characteristic.getUuid()),
-        status
+        status: status || 0
       });
     }
   }

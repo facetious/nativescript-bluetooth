@@ -238,7 +238,7 @@ export class CBPeripheralDelegateImpl extends NSObject implements CBPeripheralDe
         peripheralUUID: peripheral.identifier.UUIDString,
         serviceUUID: characteristic.service.UUID.UUIDString,
         characteristicUUID: characteristic.UUID.UUIDString,
-        status: !!error ? error.code : 0
+        status: !!error && !!error.code ? error.code : 0
       });
     } else {
       CLog(CLogTypes.warning, 'CBPeripheralDelegateImpl.peripheralDidWriteValueForCharacteristicError ---- No _onWritePromise found!');
