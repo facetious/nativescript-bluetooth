@@ -1,8 +1,3 @@
-/// <reference path="../node_modules/tns-platform-declarations/ios.d.ts" />
-
-declare var NSMakeRange;
-
-import { ios as iOS_Utils } from 'tns-core-modules/utils/utils';
 import {
   BluetoothCommon,
   CLog,
@@ -35,12 +30,7 @@ export class Bluetooth extends BluetoothCommon {
 
   // Getters/Setters
   get enabled(): boolean {
-    const state = this._centralManager.state;
-    if (state === CBManagerState.PoweredOn) {
-      return true;
-    } else {
-      return false;
-    }
+    return this._centralManager.state === CBManagerState.PoweredOn;
   }
 
   public _getState(state: CBPeripheralState) {
@@ -228,12 +218,20 @@ export class Bluetooth extends BluetoothCommon {
     });
   }
 
-  public findPeripheral(UUID): CBPeripheral {
+  public findPeripheral(UUID, suggestedPeripheral?: CBPeripheral): CBPeripheral {
     for (let i = 0; i < this._peripheralArray.count; i++) {
       const peripheral = this._peripheralArray.objectAtIndex(i);
       if (UUID === peripheral.identifier.UUIDString) {
+        if (!!suggestedPeripheral) {
+          this._peripheralArray.replaceObjectAtIndexWithObject(i, suggestedPeripheral);
+          return suggestedPeripheral;
+        }
         return peripheral;
       }
+    }
+    if (!!suggestedPeripheral) {
+      this._peripheralArray.addObject(suggestedPeripheral);
+      return suggestedPeripheral;
     }
     return null;
   }
