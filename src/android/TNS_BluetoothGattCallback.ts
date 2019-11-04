@@ -124,13 +124,24 @@ export class TNS_BluetoothGattCallback extends android.bluetooth.BluetoothGattCa
 
       const device = gatt.getDevice();
       const stateObject = this.owner.get().connections[device.getAddress()];
-      stateObject.onConnected({
-        UUID: device.getAddress(), // TODO consider renaming to id (and iOS as well)
-        name: device.getName(),
-        state: 'connected', // Bluetooth._getState(peripheral.state),
-        services: servicesJs,
-        mtu: this.mtu
-      });
+      if (stateObject && stateObject.device !== gatt) {
+        // Release this gatt since there's another one already attached.
+        CLog(
+          CLogTypes.info,
+          `TNS_BluetoothGattCallback.onServicesDiscovered ---- throwing out connection that just discovered services ${stateObject &&
+            stateObject.gatt} !== ${gatt}`
+        );
+        gatt.close();
+      }
+      if (stateObject && stateObject.onConnected) {
+        stateObject.onConnected({
+          UUID: device.getAddress(), // TODO consider renaming to id (and iOS as well)
+          name: device.getName(),
+          state: 'connected', // Bluetooth._getState(peripheral.state),
+          services: servicesJs,
+          mtu: this.mtu
+        });
+      }
     }
   }
 

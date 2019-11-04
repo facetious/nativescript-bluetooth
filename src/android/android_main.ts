@@ -27,7 +27,7 @@ declare let android, global: any;
 const AppPackageName = useAndroidX() ? global.androidx.core.app : android.support.v4.app;
 const ContentPackageName = useAndroidX() ? global.androidx.core.content : android.support.v4.content;
 
-function useAndroidX () {
+function useAndroidX() {
   return global.androidx && global.androidx.appcompat;
 }
 
@@ -94,7 +94,7 @@ export class Bluetooth extends BluetoothCommon {
 
       hasPermission =
         android.content.pm.PackageManager.PERMISSION_GRANTED ===
-          ContentPackageName.ContextCompat.checkSelfPermission(ctx, android.Manifest.permission.ACCESS_COARSE_LOCATION);
+        ContentPackageName.ContextCompat.checkSelfPermission(ctx, android.Manifest.permission.ACCESS_COARSE_LOCATION);
     }
     CLog(CLogTypes.info, 'Bluetooth.coarseLocationPermissionGranted ---- ACCESS_COARSE_LOCATION permission granted?', hasPermission);
     return hasPermission;
@@ -199,7 +199,7 @@ export class Bluetooth extends BluetoothCommon {
         }
 
         const onPermissionGranted = () => {
-          for (var key in this.connections) {
+          for (let key in this.connections) {
             if (this.connections[key] === null || this.connections[key].state === 'disconnected') {
               delete this.connections[key];
             }
@@ -665,20 +665,27 @@ export class Bluetooth extends BluetoothCommon {
   }
 
   public gattDisconnect(gatt: android.bluetooth.BluetoothGatt) {
-    if (gatt !== null) {
+    if (!!gatt) {
       const device = gatt.getDevice() as android.bluetooth.BluetoothDevice;
       CLog(CLogTypes.info, `Bluetooth.gattDisconnect ---- device: ${device}`);
       const stateObject = this.connections[device.getAddress()];
-      CLog(CLogTypes.info, `Bluetooth.gattDisconnect ---- invoking disconnect callback`);
-      if (stateObject && stateObject.onDisconnected) {
-        stateObject.onDisconnected({
-          UUID: device.getAddress(),
-          name: device.getName()
-        });
+      if (stateObject && stateObject.device === gatt) {
+        CLog(CLogTypes.info, `Bluetooth.gattDisconnect ---- invoking disconnect callback`);
+        if (stateObject && stateObject.onDisconnected) {
+          stateObject.onDisconnected({
+            UUID: device.getAddress(),
+            name: device.getName()
+          });
+        } else {
+          CLog(CLogTypes.info, 'Bluetooth.gattDisconnect ---- no disconnect callback found');
+        }
+        this.connections[device.getAddress()] = null;
       } else {
-        CLog(CLogTypes.info, 'Bluetooth.gattDisconnect ---- no disconnect callback found');
+        CLog(
+          CLogTypes.info,
+          `Bluetooth.gattDisconected ---- stateObject(${stateObject}).gatt(${stateObject && stateObject.device}) !== ${gatt}`
+        );
       }
-      this.connections[device.getAddress()] = null;
       // Close this Bluetooth GATT client.
       CLog(CLogTypes.info, 'Bluetooth.gattDisconnect ---- Closing GATT client');
       gatt.close();
