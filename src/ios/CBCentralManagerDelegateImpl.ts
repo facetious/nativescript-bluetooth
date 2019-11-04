@@ -48,7 +48,7 @@ export class CBCentralManagerDelegateImpl extends NSObject implements CBCentralM
     );
 
     const cb = this._owner.get()._connectCallbacks[peri.identifier.UUIDString];
-    const delegate = CBCentralManagerDelegateImpl.new().initWithCallback(this._owner, cb);
+    const delegate = CBPeripheralDelegateImpl.new().initWithCallback(this._owner, cb);
     CFRetain(delegate);
     peri.delegate = delegate;
 
