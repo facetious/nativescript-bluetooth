@@ -355,11 +355,17 @@ export class Bluetooth extends BluetoothCommon {
             );
           }
 
+          const existing = this.connections[arg.UUID];
+          const gatts: android.bluetooth.BluetoothGatt[] = [gatt];
+          if (!!existing) {
+            gatts.push(...(existing.devices || []));
+          }
           this.connections[arg.UUID] = {
             state: 'connecting',
             onConnected: arg.onConnected,
             onDisconnected: arg.onDisconnected,
-            device: gatt // TODO rename device to gatt?
+            device: gatt, // TODO rename device to gatt?
+            gatts
           };
         }
 
@@ -385,7 +391,7 @@ export class Bluetooth extends BluetoothCommon {
           return;
         }
 
-        this.gattDisconnect(connection.device);
+        connection.gatts.forEach(gatt => this.gattDisconnect(gatt));
         resolve();
       } catch (ex) {
         CLog(CLogTypes.error, `Bluetooth.disconnect ---- error: ${ex}`);
