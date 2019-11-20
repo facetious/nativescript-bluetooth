@@ -27,31 +27,31 @@ export class TNS_LeScanCallback extends android.bluetooth.BluetoothAdapter.LeSca
           this.owner.get().connections[device.getAddress()] = {
             state: 'disconnected'
           };
-
-          let manufacturerId;
-          let manufacturerData;
-          const manufacturerDataRaw = this.owner.get().extractManufacturerRawData(scanRecord);
-          CLog(CLogTypes.info, `TNS_LeScanCallback.onLeScan ---- manufacturerDataRaw: ${manufacturerDataRaw}`);
-          if (manufacturerDataRaw) {
-            manufacturerId = new DataView(manufacturerDataRaw, 0).getUint16(0, true);
-            CLog(CLogTypes.info, `TNS_LeScanCallback.onLeScan ---- manufacturerId: ${manufacturerId}`);
-            manufacturerData = manufacturerDataRaw.slice(2);
-            CLog(CLogTypes.info, `TNS_LeScanCallback.onLeScan ---- manufacturerData: ${manufacturerData}`);
-          }
-
-          const payload = {
-            type: 'scanResult', // TODO or use different callback functions?
-            UUID: device.getAddress(), // TODO consider renaming to id (and iOS as well)
-            name: device.getName(),
-            RSSI: rssi,
-            state: 'disconnected',
-            manufacturerId: manufacturerId,
-            manufacturerData: manufacturerData
-          };
-          CLog(CLogTypes.info, `TNS_LeScanCallback.onLeScan ---- payload: ${JSON.stringify(payload)}`);
-          this.onPeripheralDiscovered && this.onPeripheralDiscovered(payload);
-          this.owner.get().sendEvent(Bluetooth.device_discovered_event, payload);
         }
+
+        let manufacturerId;
+        let manufacturerData;
+        const manufacturerDataRaw = this.owner.get().extractManufacturerRawData(scanRecord);
+        CLog(CLogTypes.info, `TNS_LeScanCallback.onLeScan ---- manufacturerDataRaw: ${manufacturerDataRaw}`);
+        if (manufacturerDataRaw) {
+          manufacturerId = new DataView(manufacturerDataRaw, 0).getUint16(0, true);
+          CLog(CLogTypes.info, `TNS_LeScanCallback.onLeScan ---- manufacturerId: ${manufacturerId}`);
+          manufacturerData = manufacturerDataRaw.slice(2);
+          CLog(CLogTypes.info, `TNS_LeScanCallback.onLeScan ---- manufacturerData: ${manufacturerData}`);
+        }
+
+        const payload = {
+          type: 'scanResult', // TODO or use different callback functions?
+          UUID: device.getAddress(), // TODO consider renaming to id (and iOS as well)
+          name: device.getName(),
+          RSSI: rssi,
+          state: 'disconnected',
+          manufacturerId: manufacturerId,
+          manufacturerData: manufacturerData
+        };
+        CLog(CLogTypes.info, `TNS_LeScanCallback.onLeScan ---- payload: ${JSON.stringify(payload)}`);
+        this.onPeripheralDiscovered && this.onPeripheralDiscovered(payload);
+        this.owner.get().sendEvent(Bluetooth.device_discovered_event, payload);
       }
     });
     return global.__native(this);
