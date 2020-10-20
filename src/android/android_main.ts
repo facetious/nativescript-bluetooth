@@ -668,9 +668,6 @@ export class Bluetooth extends BluetoothCommon {
           return;
         }
 
-        const stateObject = this.connections[arg.peripheralUUID];
-        stateObject.onNotifyCallback = null;
-
         if (this._setNotifying(gatt, characteristic, false, reject)) {
           resolve();
         } else {
